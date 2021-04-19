@@ -1,6 +1,6 @@
 from os import path
 
-from pyrogram import Client
+from pyrogram import Client, filters
 from pyrogram.types import Message, Voice
 
 from callsmusic import callsmusic, queues
@@ -77,13 +77,12 @@ async def generate_cover(requested_by, title, views, duration, thumbnail):
     img = Image.open("temp.png")
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("etc/font.otf", 32)
-    draw.text((190, 550), f"Title: {title}", (255, 255, 255), font=font)
+    draw.text((190, 550), f"Judul: {title}", (255, 255, 255), font=font)
     draw.text(
-        (190, 590), f"Duration: {duration}", (255, 255, 255), font=font
+        (190, 590), f"Durasi: {duration}", (255, 255, 255), font=font
     )
-    draw.text((190, 630), f"Views: {views}", (255, 255, 255), font=font)
-    draw.text((190, 670),
-        f"Added By: {requested_by}",
+    draw.text((190, 630),
+        f"Request By: {requested_by}",
         (255, 255, 255),
         font=font,
     )
@@ -94,11 +93,15 @@ async def generate_cover(requested_by, title, views, duration, thumbnail):
 
 
 
-@Client.on_message(command("play") & other_filters)
+@Client.on_message(
+    filters.command(["play", "req", "putar"])
+    & filters.group
+    & ~ filters.edited
+)
 @errors
 async def play(_, message: Message):
 
-    lel = await message.reply("🔄 **Processing** sounds...")
+    lel = await message.reply("🔄 **Memproses** permintaanmu...")
     sender_id = message.from_user.id
     sender_name = message.from_user.first_name
 
@@ -106,8 +109,8 @@ async def play(_, message: Message):
             [
                 [
                     InlineKeyboardButton(
-                        text="🔊 Channel",
-                        url="https://t.me/Infinity_BOTs")
+                        text="📢 Channel",
+                        url="https://t.me/AnnabelleUpdates")
                    
                 ]
             ]
@@ -119,21 +122,16 @@ async def play(_, message: Message):
     if audio:
         if round(audio.duration / 60) > DURATION_LIMIT:
             raise DurationLimitError(
-                f"❌ Videos longer than {DURATION_LIMIT} minute(s) aren't allowed to play!"
+                f"Maaf! Lagu yang berdurasi lebih lama dari **{DURATION_LIMIT} menit** tidak dapat diputar,\nkarena durasi lagu yang kamu minta **{audio.duration / 60} menit**!"
             )
 
-        file_name = get_file_name(audio)
-        title = file_name
-        thumb_name = "https://telegra.ph/file/a4fa687ed647cfef52402.jpg"
         thumbnail = thumb_name
-        duration = round(audio.duration / 60)
-        views = "Locally added"
         keyboard = InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton(
-                            text="🔊 Channel",
-                            url=f"https://t.me/Infinity_BOTs")
+                            text="📢 Channel",
+                        url="https://t.me/AnnabelleUpdates")
 
                     ]
                 ]
@@ -161,7 +159,7 @@ async def play(_, message: Message):
                     [
                         [
                             InlineKeyboardButton(
-                                text="Watch On YouTube 🎬",
+                                text="🎬 Lihat Di YouTube",
                                 url=f"{url}")
 
                         ]
@@ -169,14 +167,14 @@ async def play(_, message: Message):
                 )
         except Exception as e:
             title = "NaN"
-            thumb_name = "https://telegra.ph/file/a4fa687ed647cfef52402.jpg"
+            thumb_name = "https://telegra.ph/file/638c20c44ca418c8b2178.jpg"
             duration = "NaN"
             views = "NaN"
             keyboard = InlineKeyboardMarkup(
                     [
                         [
                             InlineKeyboardButton(
-                                text="Watch On YouTube 🎬",
+                                text="🎬 Lihat Di YouTube",
                                 url=f"https://youtube.com")
 
                         ]
@@ -186,7 +184,7 @@ async def play(_, message: Message):
         await generate_cover(requested_by, title, views, duration, thumbnail)     
         file_path = await converter.convert(youtube.download(url))
     else:
-        await lel.edit("🔎 **Finding** the song...")
+        await lel.edit("🔎 **Mencari** lagu yang kamu minta...")
         sender_id = message.from_user.id
         user_id = message.from_user.id
         sender_name = message.from_user.first_name
@@ -197,7 +195,7 @@ async def play(_, message: Message):
         for i in message.command[1:]:
             query += ' ' + str(i)
         print(query)
-        await lel.edit("🎵 **Processing** sounds...")
+        await lel.edit("🔄 **Memproses** permintaanmu...")
         ydl_opts = {"format": "bestaudio[ext=m4a]"}
         try:
             results = YoutubeSearch(query, max_results=1).to_dict()
@@ -214,7 +212,7 @@ async def play(_, message: Message):
 
         except Exception as e:
             lel.edit(
-                "❌ Song not found.\n\nTry another song or maybe spell it properly."
+                "❎ **Lagu tidak ditemukan**.\nCoba lagu lain atau mungkin tulis nama lagu dengan benar!"
             )
             print(str(e))
             return
@@ -223,7 +221,7 @@ async def play(_, message: Message):
                 [
                     [
                         InlineKeyboardButton(
-                            text="Watch On YouTube 🎬",
+                            text="🎬 Lihat Di YouTube",
                             url=f"{url}")
 
                     ]
@@ -236,17 +234,17 @@ async def play(_, message: Message):
     if message.chat.id in callsmusic.pytgcalls.active_calls:
         position = await queues.put(message.chat.id, file=file_path)
         await message.reply_photo(
-        photo="final.png", 
-        caption=f"#⃣ Your requested song **queued** at position {position}!",
+        photo=thumb_name, 
+        caption=f"#⃣ Lagu yang kamu minta ditambah ke **antrian nomer {position}**.",
         reply_markup=keyboard)
         os.remove("final.png")
         return await lel.delete()
     else:
         callsmusic.pytgcalls.join_group_call(message.chat.id, file_path)
         await message.reply_photo(
-        photo="final.png",
+        photo=thumb_name,
         reply_markup=keyboard,
-        caption="▶️ **Playing** here the song requested by {} via DaisyX Music 😜".format(
+        caption="▶️ **Memutar lagu** request by {} via YouTube.".format(
         message.from_user.mention()
         ),
     )
