@@ -16,23 +16,22 @@ import pyrogram
 
 logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
-@app.on_message(pyrogram.filters.command(["search"]))
+@app.on_message(pyrogram.filters.command(["search", "yts", "cari"]))
 async def ytsearch(_, message: Message):
     try:
         if len(message.command) < 2:
-            await message.reply_text("/search needs an argument!")
+            await message.reply_text("❗ Pencarian membutuhkan argumen!")
             return
         query = message.text.split(None, 1)[1]
-        m = await message.reply_text("Searching....")
-        results = YoutubeSearch(query, max_results=4).to_dict()
+        m = await message.reply_text("🔎 Mencari....")
+        results = YoutubeSearch(query, max_results=10).to_dict()
         i = 0
         text = ""
         while i < 4:
-            text += f"Title - {results[i]['title']}\n"
-            text += f"Duration - {results[i]['duration']}\n"
-            text += f"Views - {results[i]['views']}\n"
-            text += f"Channel - {results[i]['channel']}\n"
-            text += f"https://youtube.com{results[i]['url_suffix']}\n\n"
+            text += f"**Judul:** [{results[i]['title']}](https://youtube.com{results[i]['url_suffix']})\n"
+            text += f"**Durasi:** `{results[i]['duration']}`\n"
+            text += f"**Views:** `{results[i]['views']}`\n"
+            text += f"**Channel:** `{results[i]['channel']}`\n\n"
             i += 1
         await m.edit(text, disable_web_page_preview=True)
     except Exception as e:
