@@ -23,14 +23,14 @@ Tambahkan saya ke grup Anda dan mainkan musik dengan bebas!**
                         "🛠 Cara Penggunaan 🛠", url="https://t.me/tutorilmrmusik/3")
                   ],[
                     InlineKeyboardButton(
-                        "💀 Instagram", url="https://Instagram.com/xrrmli"
+                        "💀 Instagram", url="https://Instagram.com/ref.yndra_"
                     ),
                     InlineKeyboardButton(
-                        "💀 Owner", url="https://t.me/mentalbrikden"
+                        "💀 Owner", url="https://t.me/rendzxyy"
                     )
                 ],[ 
                     InlineKeyboardButton(
-                        "➕ Tambahkan ke Grup Anda ➕", url="https://t.me/ilmrmusikbot?startgroup=true"
+                        "➕ Tambahkan ke Grup Anda ➕", url="https://t.me/rendzxy_bot?startgroup=true"
                     )]
             ]
         ),
