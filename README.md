@@ -28,7 +28,7 @@
 
 ### Deploy To Heroku</h4>
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/rendzxyy/GroupMusicBot)
+[![Deploy](https://heroku.com/deploy?template=https://github.com/rendzxy/GroupMusicBot
 
 Get pyrogram STRING_NAME from here ⬇️
 
